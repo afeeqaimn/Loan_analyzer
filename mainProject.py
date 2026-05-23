@@ -1,12 +1,18 @@
+from dotenv import load_dotenv
+load_dotenv() #Read the .env file
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware 
 from groq import Groq
 import json
 import requests
 import os
-from dotenv import load_dotenv
+from sqlalchemy.orm import Session
+from fastapi import Depends
+import models
+import schemas
+from database import engine, get_db
 
-load_dotenv() #Read the .env file
+models.Base.metadata.create_all(bind=engine)
 
 client = Groq(
     api_key=os.getenv("GROQ_API_KEY") #Access the groq apikey
@@ -19,7 +25,6 @@ app.add_middleware( #Allow frontend to communicate w backend
     allow_origins=["*"], #Allow access from any website
     allow_methods=["*"], #Allow all types of request (POST, ,GET, PUT, DELETE)
     allow_headers=["*"] #Allow frontend to send any extra (API keys, content)
-
 )
 
 def read_content(fileContent, title): #fileContent reads the content, title read title
@@ -35,11 +40,15 @@ def read_content(fileContent, title): #fileContent reads the content, title read
     if result["IsErroredOnProcessing"]:
         raise HTTPException(status_code=400, detail="pdf/png is not clear")
 
-    return result["ParsedResults"][0]["ParsedText"] #key, index-key, final value
+    parsedResult = result.get("ParsedResults")
+    if not parsedResult:
+        raise HTTPException(status_code=400, detail="pdf/png is not clear")
+    
+    return parsedResult[0]["ParsedText"] 
 
 @app.post("/analyze-loan")
-def get_loan(file: UploadFile = File(None), text: str = Form(None)): #None= User can leave empty
-    if not file and not text:
+def get_loan(file: UploadFile = File(None), text: str = Form(None), db: Session = Depends(get_db)): #None= User can leave empty
+    if not file and not text: 
         raise HTTPException(status_code=400, detail="File not supported")
     if text:
         read_text = text
@@ -116,7 +125,32 @@ def get_loan(file: UploadFile = File(None), text: str = Form(None)): #None= User
         risk_level = "CAUTION"
     else:
         risk_level = "SAFE"
-        
+
+    # Save to database
+    db_document = models.LoanDocument(
+        filename=file.filename if file else "pasted_text.txt",
+        raw_text=read_text
+    )
+    db.add(db_document)
+    db.commit()
+    db.refresh(db_document)
+
+    db_analysis = models.LoanAnalysis(
+        document_id=db_document.id,
+        monthly_payment=result3.get("monthly_payment"),
+        total_repayment=result3.get("total_repayment"),
+        penalties=str(result3.get("penalties", "")),
+        hidden_fees=str(result3.get("hidden_fees", "")),
+        risk_level=risk_level,
+        interest_year=interest,
+        risk_score=risk_score,
+        flag_suspicious=bool(flag_suspicious),
+        bm_summary=result3.get("bm_summary", ""),
+        en_summary=result3.get("en_summary", "")
+    )
+    db.add(db_analysis)
+    db.commit()
+    
     return {
         "risk_level": risk_level,
         "result": result3,
