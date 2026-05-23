@@ -6,10 +6,10 @@ import requests
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv() #Read the .env file
 
 client = Groq(
-    api_key=os.getenv("GROQ_API_KEY")
+    api_key=os.getenv("GROQ_API_KEY") #Access the groq apikey
 )
 
 app = FastAPI()
@@ -116,7 +116,7 @@ def get_loan(file: UploadFile = File(None), text: str = Form(None)): #None= User
         risk_level = "CAUTION"
     else:
         risk_level = "SAFE"
-    #Add return for read file later
+        
     return {
         "risk_level": risk_level,
         "result": result3,
