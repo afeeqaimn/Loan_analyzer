@@ -97,6 +97,7 @@ def get_loan(file: UploadFile = File(None), text: str = Form(None), db: Session 
     
     try:
         interestStr = str(result3.get("interest_year", 0))
+        interestStr = interestStr.replace("%", "").replace(" ", "").strip()
         interest = float(interestStr)
     except (ValueError, KeyError):
         raise HTTPException(status_code=500, detail="interest_year is invalid")
