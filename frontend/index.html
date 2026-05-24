@@ -507,12 +507,12 @@
         document.getElementById(
         "penalties"
         ).innerHTML =
-        JSON.stringify(result.penalties);;
+        Object.entries(result.penalties).map(([k,v]) => `<b>${k.replace(/_/g,' ')}:</b> ${v}`).join('<br>');
 
         document.getElementById(
         "hiddenFees"
         ).innerHTML =
-        JSON.stringify(result.hidden_fees);;
+        Object.entries(result.hidden_fees).map(([k,v]) => `<b>${k.replace(/_/g,' ')}:</b> ${v}`).join('<br>');
 
         let risk =
         document.getElementById(
