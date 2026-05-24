@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+  content="width=device-width, initial-scale=1.0">
+
+  <title>AI Loan Analyzer</title>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, sans-serif;
+    }
+
+    body{
+    background-image: url("bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    margin:0;
+}
+
+
+    .container{
+
+      max-width:950px;
+
+      margin:auto;
+
+      background:rgba(255, 255, 255, 0.45);
+
+      backdrop-filter:blur(10px);
+
+      border:1px solid rgba(255, 255, 255, 0.2);
+
+      padding:35px;
+
+      border-radius:25px;
+
+      box-shadow:
+      0 10px 30px rgba(0,0,0,0.4);
+
+      animation:fadeIn 1s ease;
+    }
+
+    @keyframes fadeIn{
+
+      from{
+        opacity:0;
+        transform:translateY(30px);
+      }
+
+      to{
+        opacity:1;
+        transform:translateY(0);
+      }
+
+    }
+
+    h1{
+
+      text-align:center;
+
+      color:#090003;
+
+      margin-bottom:10px;
+
+      font-size:50px;
+
+      text-shadow:0 0 10px rgba(116, 31, 59, 0.8);
+    }
+
+    .subtitle{
+
+      text-align:center;
+
+      color:rgb(5, 1, 1);
+
+      margin-bottom:35px;
+
+      font-size:18px;
+    }
+
+    .card{
+
+      background:rgba(255,255,255,0.08);
+
+      border:1px solid rgba(255,255,255,0.1);
+
+      padding:25px;
+
+      border-radius:20px;
+
+      margin-bottom:25px;
+
+      transition:0.3s;
+    }
+
+    .card:hover{
+
+      transform:translateY(-5px);
+
+      box-shadow:
+      0 10px 20px rgba(0,0,0,0.3);
+    }
+
+    h2{
+
+      color:#000000;
+
+      margin-bottom:20px;
+    }
+
+    textarea,
+    input{
+
+      width:100%;
+
+      padding:14px;
+
+      margin-bottom:15px;
+
+      border-radius:12px;
+
+      border:2px solid rgba(255,255,255,0.2);
+
+      background:rgba(255,255,255,0.08);
+
+      color:rgb(0, 0, 0);
+
+      font-size:16px;
+
+      transition:0.3s;
+    }
+
+    textarea{
+
+      resize:none;
+
+      height:220px;
+    }
+
+    textarea::placeholder{
+      color:#030202;
+    }
+
+    input::placeholder{
+      color:#ddd;
+    }
+
+    textarea:focus,
+    input:focus{
+
+      outline:none;
+
+      border-color:#710a0a;
+
+      transform:scale(1.01);
+    }
+
+    button{
+
+      width:100%;
+
+      padding:15px;
+
+      border:none;
+
+      border-radius:12px;
+
+      background:#791335;
+
+      color:white;
+
+      font-size:18px;
+
+      cursor:pointer;
+
+      transition:0.3s;
+    }
+
+    button:hover{
+
+      background:#e6005c;
+
+      transform:scale(1.02);
+
+      box-shadow:
+      0 0 15px rgba(125, 111, 116, 0.8);
+    }
+
+    .loading{
+
+      display:none;
+
+      text-align:center;
+
+      margin-top:20px;
+
+      font-size:20px;
+
+      color:#ff2f73;
+
+      animation:pulse 1s infinite;
+    }
+
+    @keyframes pulse{
+
+      0%{
+        opacity:0.5;
+      }
+
+      50%{
+        opacity:1;
+      }
+
+      100%{
+        opacity:0.5;
+      }
+
+    }
+
+    .result-box{
+
+      display:none;
+
+      margin-top:30px;
+
+      animation:slideUp 0.8s ease;
+    }
+
+    @keyframes slideUp{
+
+      from{
+        opacity:0;
+        transform:translateY(20px);
+      }
+
+      to{
+        opacity:1;
+        transform:translateY(0);
+      }
+
+    }
+
+    .result-item{
+
+      background:rgba(255,255,255,0.08);
+
+      color:white;
+
+      padding:20px;
+
+      border-radius:15px;
+
+      margin-bottom:15px;
+
+      border-left:6px solid #ff2f73;
+    }
+
+    .result-item h3{
+
+      color:#ff2f73;
+
+      margin-bottom:10px;
+    }
+
+    .result-item p{
+
+      line-height:1.7;
+
+      color:white;
+    }
+
+    .risk-high{
+      color:red;
+      font-weight:bold;
+      font-size:22px;
+    }
+
+    .risk-medium{
+      color:orange;
+      font-weight:bold;
+      font-size:22px;
+    }
+
+    .risk-low{
+      color:lime;
+      font-weight:bold;
+      font-size:22px;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>AI Loan Analyzer</h1>
+
+    <p class="subtitle">
+      AI-Powered Loan Risk Analysis System
+    </p>
+
+    <!-- Loan Text -->
+    <div class="card">
+
+      <h2>Paste Loan Agreement</h2>
+
+      <textarea
+      id="loanText"
+      placeholder="Paste loan agreement text here..."></textarea>
+
+    </div>
+
+    <!-- Upload File -->
+    <div class="card">
+
+      <h2>Upload Loan File</h2>
+
+      <input
+      type="file"
+      id="loanFile"
+      accept=".txt,.pdf,image/*">
+
+    </div>
+
+    <!-- Analyze Button -->
+    <button onclick="analyzeLoan()">
+
+      Analyze Loan
+
+    </button>
+
+    <!-- Loading -->
+    <div
+    class="loading"
+    id="loading">
+
+      AI is analyzing loan agreement...
+
+    </div>
+
+    <!-- Results -->
+    <div
+    class="result-box"
+    id="resultBox">
+
+      <div class="result-item">
+
+        <h3>Monthly Payment</h3>
+
+        <p id="monthlyPayment">
+          -
+        </p>
+
+      </div>
+
+      <div class="result-item">
+
+        <h3>Penalties</h3>
+
+        <p id="penalties">
+          -
+        </p>
+
+      </div>
+
+      <div class="result-item">
+
+        <h3>Hidden Fees</h3>
+
+        <p id="hiddenFees">
+          -
+        </p>
+
+      </div>
+
+      <div class="result-item">
+
+        <h3>Risk Level</h3>
+
+        <p id="riskLevel">
+          -
+        </p>
+
+      </div>
+
+      <div class="result-item">
+
+        <h3>Bahasa Melayu Summary</h3>
+
+        <p id="bmSummary">
+          -
+        </p>
+
+      </div>
+
+      <div class="result-item">
+
+        <h3>English Summary</h3>
+
+        <p id="enSummary">
+          -
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    async function analyzeLoan(){
+
+      let text =
+      document.getElementById(
+      "loanText"
+      ).value;
+
+      let file =
+      document.getElementById(
+      "loanFile"
+      ).files[0];
+
+      if(!text && !file){
+
+        alert(
+        "Please upload file or paste text."
+        );
+
+        return;
+      }
+
+      document.getElementById(
+      "loading"
+      ).style.display = "block";
+
+      document.getElementById(
+      "resultBox"
+      ).style.display = "none";
+
+      let formData =
+      new FormData();
+
+      if(text){
+
+        formData.append(
+        "text",
+        text
+        );
+      }
+
+      if(file){
+
+        formData.append(
+        "file",
+        file
+        );
+      }
+
+      try{
+
+        let response =
+        await fetch(
+
+          "https://loan-analyzer-zhx5.onrender.com/analyze-loan",
+
+          {
+            method:"POST",
+            body:formData
+          }
+
+        );
+
+        let data =
+        await response.json();
+
+        console.log(data);
+
+        document.getElementById(
+        "loading"
+        ).style.display = "none";
+
+        document.getElementById(
+        "resultBox"
+        ).style.display = "block";
+
+        let result =
+        data.result;
+
+        document.getElementById(
+        "monthlyPayment"
+        ).innerHTML =
+        result.monthly_payment;
+
+        document.getElementById(
+        "penalties"
+        ).innerHTML =
+        result.penalties;
+
+        document.getElementById(
+        "hiddenFees"
+        ).innerHTML =
+        result.hidden_fees;
+
+        let risk =
+        document.getElementById(
+        "riskLevel"
+        );
+
+        risk.innerHTML =
+        result.risk_level;
+
+        risk.className = "";
+
+        if(
+        result.risk_level == "HIGH"
+        ){
+
+          risk.classList.add(
+          "risk-high"
+          );
+
+        }
+
+        else if(
+        result.risk_level == "MEDIUM"
+        ){
+
+          risk.classList.add(
+          "risk-medium"
+          );
+
+        }
+
+        else{
+
+          risk.classList.add(
+          "risk-low"
+          );
+        }
+
+        document.getElementById(
+        "bmSummary"
+        ).innerHTML =
+        result.bm_summary;
+
+        document.getElementById(
+        "enSummary"
+        ).innerHTML =
+        result.en_summary;
+
+      }
+
+      catch(error){
+
+        console.log(error);
+
+        document.getElementById(
+        "loading"
+        ).style.display = "none";
+
+        alert(
+        "Failed to connect backend."
+        );
+
+      }
+
+    }
+
+  </script>
+
+</body>
+</html>
+
+
