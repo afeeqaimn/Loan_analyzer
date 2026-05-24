@@ -507,12 +507,12 @@
         document.getElementById(
         "penalties"
         ).innerHTML =
-        result.penalties;
+        JSON.stringify(result.penalties);;
 
         document.getElementById(
         "hiddenFees"
         ).innerHTML =
-        result.hidden_fees;
+        JSON.stringify(result.hidden_fees);;
 
         let risk =
         document.getElementById(
@@ -520,7 +520,7 @@
         );
 
         risk.innerHTML =
-        result.risk_level;
+        data.risk_level;
 
         risk.className = "";
 
