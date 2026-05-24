@@ -524,31 +524,14 @@
 
         risk.className = "";
 
-        if(
-        result.risk_level == "HIGH"
-        ){
-
-          risk.classList.add(
-          "risk-high"
-          );
-
+        if(data.risk_level == "DANGEROUS"){
+        risk.classList.add("risk-high");
         }
-
-        else if(
-        result.risk_level == "MEDIUM"
-        ){
-
-          risk.classList.add(
-          "risk-medium"
-          );
-
+        else if(data.risk_level == "CAUTION"){
+        risk.classList.add("risk-medium");
         }
-
         else{
-
-          risk.classList.add(
-          "risk-low"
-          );
+        risk.classList.add("risk-low");
         }
 
         document.getElementById(
