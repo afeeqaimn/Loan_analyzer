@@ -507,12 +507,16 @@
         document.getElementById(
         "penalties"
         ).innerHTML =
-        Object.entries(result.penalties).map(([k,v]) => `<b>${k.replace(/_/g,' ')}:</b> ${v}`).join('<br>');
+        Object.entries(result.penalties)
+          .map(([k,v]) => `<b>${k.replace(/_/g,' ')}:</b> ${v}`)
+          .join('<br>');
 
         document.getElementById(
         "hiddenFees"
         ).innerHTML =
-        Object.entries(result.hidden_fees).map(([k,v]) => `<b>${k.replace(/_/g,' ')}:</b> ${v}`).join('<br>');
+        Object.entries(result.hidden_fees)
+          .map(([k,v]) => `<b>${k.replace(/_/g,' ')}:</b> ${v}`)
+          .join('<br>');
 
         let risk =
         document.getElementById(
